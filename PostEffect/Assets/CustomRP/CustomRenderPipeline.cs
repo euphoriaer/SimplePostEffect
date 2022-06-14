@@ -13,6 +13,7 @@ namespace Assets.CustomRP
                 renderer.Render(context, camera);
             }
         }
+       
 
     }
 
