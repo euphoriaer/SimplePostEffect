@@ -9,9 +9,9 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: URP_MultiLightShadow
   m_Shader: {fileID: 4800000, guid: 2111d535824e2a3419177bbd9e257064, type: 3}
-  m_ValidKeywords:
+  m_ValidKeywords: []
+  m_InvalidKeywords:
   - _AdditionalLights
-  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -26,6 +26,6 @@ Material:
     - _AddLights: 1
     - _Gloss: 8
     m_Colors:
-    - _Diffuse: {r: 0.4245283, g: 0.35444108, b: 0.35444108, a: 1}
-    - _Specular: {r: 1, g: 1, b: 1, a: 1}
+    - _Diffuse: {r: 1, g: 1, b: 1, a: 1}
+    - _Specular: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

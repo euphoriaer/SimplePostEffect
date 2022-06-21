@@ -1,6 +1,8 @@
-﻿Shader "Custom/BaseMask" {
+﻿Shader "Custom/BaseMask"
+{
     Properties
-    {   [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend("SrcBlend", Float) = 5
+    {
+        [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend("SrcBlend", Float) = 5
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend("DstBlend", Float) = 10
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTestMode("ZTestMode", Float) = 4
         [Enum(Off, 0, On, 1)]_ZWriteMode("ZWriteMode", float) = 0
@@ -11,12 +13,12 @@
         _MaskTexture("Mask", 2D) = "white" {}
         _DiscardAlpha("裁剪Alpha值", range(0,1))=0.1
         [Toggle(_EMISSION)]_Emission("自发光", int) = 0
-         [HDR] _EmissionColor("自发光颜色", Color) = (0,0,0)
+        [HDR] _EmissionColor("自发光颜色", Color) = (0,0,0)
         _EmissionMap("Emission", 2D) = "black" {}
-        
+
         _LutTex("LutTexture", 2D) = "white" {}
         _LutRatio("LutRatio", float) = 0
-        
+
         _MaskTan("MaskTan", float) = 0.0
         _UseNewMASK("UseNewMASK", int) = 0
         [HDR]_MaskEndColor("MaskEndColor", Color) = (1,1,1)
@@ -45,46 +47,58 @@
         _CloudShadowOffset("CloudShadowOffset", Vector) = (0,0,0,0)
     }
 
-        SubShader
+    SubShader
+    {
+        Pass
         {
-            Pass
+            Tags
             {
-                Tags{"RenderPipeline" = "UniversalPipeline"
-                    "RenderType" = "Opaque"
-                    "IgnoreProjector" = "True"
-                    "Queue" = "Opaque"}
-                LOD 300
-                Blend[_SrcBlend][_DstBlend]
-                ZWrite[_ZWriteMode]
-                ZTest[_ZTestMode]
-                Cull Off
-                Name "Unlit"
-                HLSLPROGRAM
-                #pragma vertex vert
-                #pragma fragment frag
-                #pragma multi_compile_instancing
-                #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-                #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+                "RenderPipeline" = "UniversalPipeline"
+                "RenderType" = "Opaque"
+                "IgnoreProjector" = "True"
+                "Queue" = "Opaque"
+                "LightMode" = "UniversalForward"
+            }
+            LOD 300
+            Blend[_SrcBlend][_DstBlend]
+            ZWrite[_ZWriteMode]
+            ZTest[_ZTestMode]
+            Cull Off
+            Name "Unlit"
+            HLSLPROGRAM
+            //shadow
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _SHADOWS_SOFT
+            
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma multi_compile_instancing
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+            //shadow
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-                #pragma multi_compile _ _MASK
-                #pragma shader_feature_local_fragment _EMISSION
+            #pragma multi_compile _ _MASK
+            #pragma shader_feature_local_fragment _EMISSION
 
-                half4 _Color;
-                half _Alpha;
-                TEXTURE2D(_MainTex);
-                SAMPLER(sampler_MainTex);
-                half4 _MainTex_ST;
+            half4 _Color;
+            half _Alpha;
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            half4 _MainTex_ST;
 
-                TEXTURE2D(_LutTex);
-                float _DiscardAlpha;
-                SamplerState sampler_LinearClamp;
-                half _LutRatio;
+            TEXTURE2D(_LutTex);
+            float _DiscardAlpha;
+            SamplerState sampler_LinearClamp;
+            half _LutRatio;
 
-                TEXTURE2D(_EmissionMap);
-                SAMPLER(sampler_EmissionMap);
-                
-                half3 _EmissionColor;
-                #if _MASK 
+            TEXTURE2D(_EmissionMap);
+            SAMPLER(sampler_EmissionMap);
+
+            half3 _EmissionColor;
+            #if _MASK
                     sampler2D _MaskTexture;
                     float _MaskTan;
                     int _UseNewMASK;
@@ -114,154 +128,161 @@
                     float3 _MaskEndDivideColor;
                     float2 _CloudShadowSpeed;
                     float2 _CloudShadowOffset;
-                #endif
+            #endif
 
-                struct Attributes
-                {
-                    float4 positionOS       : POSITION;
-                    float2 uv               : TEXCOORD0;
-                    UNITY_VERTEX_INPUT_INSTANCE_ID
-                };
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
 
-                struct Varyings
-                {
-                    float4 vertex : POSITION;
-                    float2 uv        : TEXCOORD0;
-                    float3 positionWS               : TEXCOORD1;
-                    UNITY_VERTEX_INPUT_INSTANCE_ID
-                    UNITY_VERTEX_OUTPUT_STEREO
-                };
+            struct Varyings
+            {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+                float3 positionWS : TEXCOORD1;
+                //float4 positionCS: SV_POSITION;
+                // float4 positionCS: SV_POSITION;
+                // float3 positionWS: TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
 
-                Varyings vert(Attributes input)
+            Varyings vert(Attributes input)
+            {
+                Varyings output = (Varyings)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+                output.uv = TRANSFORM_TEX(input.uv, _MainTex);
+                output.vertex = TransformObjectToHClip(input.positionOS);
+                output.positionWS = mul(unity_ObjectToWorld, input.positionOS);
+
+                //shadow
+                VertexPositionInputs positionInputs = GetVertexPositionInputs(input.positionOS.xyz);
+                output.positionWS = positionInputs.positionWS;
+                return output;
+            }
+
+            half RGBToL(half3 color)
+            {
+                half fmin = min(min(color.r, color.g), color.b); //Min. value of RGB
+                half fmax = max(max(color.r, color.g), color.b); //Max. value of RGB
+
+                return (fmax + fmin) / 2.0; // Luminance
+            }
+
+            half3 RGBToHSL(half3 color)
+            {
+                half3 hsl; // init to 0 to avoid warnings ? (and reverse if + remove first part)
+
+                half fmin = min(min(color.r, color.g), color.b); //Min. value of RGB
+                half fmax = max(max(color.r, color.g), color.b); //Max. value of RGB
+                half delta = fmax - fmin; //Delta RGB value
+
+                hsl.z = (fmax + fmin) / 2.0; // Luminance
+
+                if (delta == 0.0) //This is a gray, no chroma...
                 {
-                    Varyings output = (Varyings)0;
-                    UNITY_SETUP_INSTANCE_ID(input);
-                    UNITY_TRANSFER_INSTANCE_ID(input, output);
-                    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-                    output.uv = TRANSFORM_TEX(input.uv, _MainTex);
-                    output.vertex = TransformObjectToHClip(input.positionOS);
-                    output.positionWS = mul(unity_ObjectToWorld, input.positionOS);
-                    return output;
+                    hsl.x = 0.0; // Hue
+                    hsl.y = 0.0; // Saturation
                 }
-
-                half RGBToL(half3 color)
+                else //Chromatic data...
                 {
-                    half fmin = min(min(color.r, color.g), color.b);    //Min. value of RGB
-                    half fmax = max(max(color.r, color.g), color.b);    //Max. value of RGB
-
-                    return (fmax + fmin) / 2.0; // Luminance
-                }
-
-                half3 RGBToHSL(half3 color)
-                {
-                    half3 hsl; // init to 0 to avoid warnings ? (and reverse if + remove first part)
-
-                    half fmin = min(min(color.r, color.g), color.b);    //Min. value of RGB
-                    half fmax = max(max(color.r, color.g), color.b);    //Max. value of RGB
-                    half delta = fmax - fmin;             //Delta RGB value
-
-                    hsl.z = (fmax + fmin) / 2.0; // Luminance
-
-                    if (delta == 0.0)		//This is a gray, no chroma...
-                    {
-                        hsl.x = 0.0;	// Hue
-                        hsl.y = 0.0;	// Saturation
-                    }
-                    else                                    //Chromatic data...
-                    {
-                        if (hsl.z < 0.5)
-                            hsl.y = delta / (fmax + fmin); // Saturation
-                        else
-                            hsl.y = delta / (2.0 - fmax - fmin); // Saturation
-
-                        half deltaR = (((fmax - color.r) / 6.0) + (delta / 2.0)) / delta;
-                        half deltaG = (((fmax - color.g) / 6.0) + (delta / 2.0)) / delta;
-                        half deltaB = (((fmax - color.b) / 6.0) + (delta / 2.0)) / delta;
-
-                        if (color.r == fmax)
-                            hsl.x = deltaB - deltaG; // Hue
-                        else if (color.g == fmax)
-                            hsl.x = (1.0 / 3.0) + deltaR - deltaB; // Hue
-                        else if (color.b == fmax)
-                            hsl.x = (2.0 / 3.0) + deltaG - deltaR; // Hue
-
-                        if (hsl.x < 0.0)
-                            hsl.x += 1.0; // Hue
-                        else if (hsl.x > 1.0)
-                            hsl.x -= 1.0; // Hue
-                    }
-
-                    return hsl;
-                }
-
-                half HueToRGB(half f1, half f2, half hue)
-                {
-                    if (hue < 0.0)
-                        hue += 1.0;
-                    else if (hue > 1.0)
-                        hue -= 1.0;
-                    half res;
-                    if ((6.0 * hue) < 1.0)
-                        res = f1 + (f2 - f1) * 6.0 * hue;
-                    else if ((2.0 * hue) < 1.0)
-                        res = f2;
-                    else if ((3.0 * hue) < 2.0)
-                        res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
+                    if (hsl.z < 0.5)
+                        hsl.y = delta / (fmax + fmin); // Saturation
                     else
-                        res = f1;
-                    return res;
+                        hsl.y = delta / (2.0 - fmax - fmin); // Saturation
+
+                    half deltaR = (((fmax - color.r) / 6.0) + (delta / 2.0)) / delta;
+                    half deltaG = (((fmax - color.g) / 6.0) + (delta / 2.0)) / delta;
+                    half deltaB = (((fmax - color.b) / 6.0) + (delta / 2.0)) / delta;
+
+                    if (color.r == fmax)
+                        hsl.x = deltaB - deltaG; // Hue
+                    else if (color.g == fmax)
+                        hsl.x = (1.0 / 3.0) + deltaR - deltaB; // Hue
+                    else if (color.b == fmax)
+                        hsl.x = (2.0 / 3.0) + deltaG - deltaR; // Hue
+
+                    if (hsl.x < 0.0)
+                        hsl.x += 1.0; // Hue
+                    else if (hsl.x > 1.0)
+                        hsl.x -= 1.0; // Hue
                 }
 
-                half3 HSLToRGB(half3 hsl)
-                {
-                    half3 rgb;
+                return hsl;
+            }
 
-                    if (hsl.y == 0.0)
-                        rgb = half3(hsl.z, hsl.z, hsl.z); // Luminance
+            half HueToRGB(half f1, half f2, half hue)
+            {
+                if (hue < 0.0)
+                    hue += 1.0;
+                else if (hue > 1.0)
+                    hue -= 1.0;
+                half res;
+                if ((6.0 * hue) < 1.0)
+                    res = f1 + (f2 - f1) * 6.0 * hue;
+                else if ((2.0 * hue) < 1.0)
+                    res = f2;
+                else if ((3.0 * hue) < 2.0)
+                    res = f1 + (f2 - f1) * ((2.0 / 3.0) - hue) * 6.0;
+                else
+                    res = f1;
+                return res;
+            }
+
+            half3 HSLToRGB(half3 hsl)
+            {
+                half3 rgb;
+
+                if (hsl.y == 0.0)
+                    rgb = half3(hsl.z, hsl.z, hsl.z); // Luminance
+                else
+                {
+                    half f2;
+
+                    if (hsl.z < 0.5)
+                        f2 = hsl.z * (1.0 + hsl.y);
                     else
-                    {
-                        half f2;
+                        f2 = (hsl.z + hsl.y) - (hsl.y * hsl.z);
 
-                        if (hsl.z < 0.5)
-                            f2 = hsl.z * (1.0 + hsl.y);
-                        else
-                            f2 = (hsl.z + hsl.y) - (hsl.y * hsl.z);
+                    half f1 = 2.0 * hsl.z - f2;
 
-                        half f1 = 2.0 * hsl.z - f2;
-
-                        rgb.r = HueToRGB(f1, f2, hsl.x + (1.0 / 3.0));
-                        rgb.g = HueToRGB(f1, f2, hsl.x);
-                        rgb.b = HueToRGB(f1, f2, hsl.x - (1.0 / 3.0));
-                    }
-
-                    return rgb;
+                    rgb.r = HueToRGB(f1, f2, hsl.x + (1.0 / 3.0));
+                    rgb.g = HueToRGB(f1, f2, hsl.x);
+                    rgb.b = HueToRGB(f1, f2, hsl.x - (1.0 / 3.0));
                 }
-                
-                half3 SampleEmission(float2 uv, half3 emissionColor, TEXTURE2D_PARAM(emissionMap, sampler_emissionMap))
-                {
+
+                return rgb;
+            }
+
+            half3 SampleEmission(float2 uv, half3 emissionColor, TEXTURE2D_PARAM(emissionMap, sampler_emissionMap))
+            {
                 #ifndef _EMISSION
-                    return 0;
+                return 0;
                 #else
                     return SAMPLE_TEXTURE2D(emissionMap, sampler_emissionMap, uv).rgb * emissionColor;
                 #endif
-                }
+            }
 
-                half4 frag(Varyings input) : SV_Target
-                {
-                    UNITY_SETUP_INSTANCE_ID(input);
-                    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-                    half4 c = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-                    c *= _Color;
+            half4 frag(Varyings input) : SV_Target
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                half4 c = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+                c *= _Color;
 
-                    //(1f / lut.width, 1f / lut.height, lut.height - 1f)
-                    float3 userLutParams = float3(1.0 / 256, 1.0 / 16, 15);
+                //(1f / lut.width, 1f / lut.height, lut.height - 1f)
+                float3 userLutParams = float3(1.0 / 256, 1.0 / 16, 15);
 
-                    c.rgb = LinearToSRGB(c.rgb);
-                    half3 outLut = ApplyLut2D(TEXTURE2D_ARGS(_LutTex, sampler_LinearClamp), c.rgb, userLutParams);
-                    c.rgb = lerp(c.rgb, outLut, _LutRatio);
-                    c.rgb = SRGBToLinear(c.rgb);
+                c.rgb = LinearToSRGB(c.rgb);
+                half3 outLut = ApplyLut2D(TEXTURE2D_ARGS(_LutTex, sampler_LinearClamp), c.rgb, userLutParams);
+                c.rgb = lerp(c.rgb, outLut, _LutRatio);
+                c.rgb = SRGBToLinear(c.rgb);
 
-                    #if _MASK 
+                #if _MASK
                         half3 pos = input.positionWS;
                         pos.x -= _MapVector.x;
                         pos.z -= _MapVector.y - pos.y * _MaskTan;
@@ -300,16 +321,23 @@
                         oldLum *= pow(2, lerp(_MaskStartExposure, _MaskEndExposure, mask.a));
                         c.rgb = HSLToRGB(half3(newHSL.x, newHSL.y, oldLum));
                         c.rgb /= lerp(_MaskStartDivideColor, _MaskEndDivideColor, mask.a);
-                    #endif
-                    
-                    half3  emission = SampleEmission(input.uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
-                    c.rgb += emission;
-                    if (c.a < _DiscardAlpha) discard;
-                    return c;
-                }
+                #endif
 
-                ENDHLSL
+                half3 emission = SampleEmission(input.uv, _EmissionColor.rgb,
+                                                TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
+                c.rgb += emission;
+                if (c.a < _DiscardAlpha) discard;
+                //shadow
+                // 获取阴影坐标
+                float4 shadowCoord = TransformWorldToShadowCoord(input.positionWS.xyz);
+                //使用HLSL的函数获取主光源数据
+                Light mainLight = GetMainLight(shadowCoord);
+                half3 diffuse = mainLight.color * mainLight.distanceAttenuation * mainLight.shadowAttenuation * c
+                    .rgb;
+                return half4(diffuse, c.a);
             }
+            ENDHLSL
         }
-            FallBack "Hidden/Universal Render Pipeline/FallbackError"
+    }
+    FallBack "Hidden/Universal Render Pipeline/FallbackError"
 }
