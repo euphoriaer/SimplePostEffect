@@ -2,7 +2,6 @@
 {
     Properties
     {
-
         _MainTex("Albedo (RGB)", 2D) = "white" {}
         _Color("Outline Color", Color) = (0, 237, 255, 0)
         _Outline("Outline width", Range(.0, 0.1)) = 0.013
@@ -15,7 +14,7 @@
         _DstBlend("Dst Blend", int) = 0
         _ZWrite("Z Write", int) = 1
         _ZOffset("Z Offset", float) = 0
-        _ColorMask ("Color Mask", int) = 15
+        _ColorMask("Color Mask", int) = 15
         [Toggle(_TURN_STONE)]_turn_stone("石化", int) = 0
         _GrayScale("石化强度", Float) = 1
 
@@ -26,106 +25,18 @@
 
     SubShader
     {
-
         LOD 500
-        //阴影pass
-        Pass
-        {
-            Name "Shadow"
-
-            //用使用模板测试以保证alpha显示正确
-            Stencil
-            {
-                Ref 0
-                Comp equal
-                Pass incrWrap
-                Fail keep
-                ZFail keep
-            }
-
-            //透明混合模式
-            Blend SrcAlpha OneMinusSrcAlpha
-
-            //关闭深度写入
-            ZWrite off
-
-            HLSLPROGRAM
-            #pragma vertex vert
-            #pragma fragment frag
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            //#include "UnityCG.cginc"
-
-            struct appdata
-            {
-                float4 vertex : POSITION;
-            };
-
-            struct v2f
-            {
-                float4 vertex : SV_POSITION;
-                float4 color : COLOR;
-            };
-
-            float4 _LightDir;
-            float4 _ShadowColor;
-            float _ShadowFalloff;
-
-            float3 ShadowProjectPos(float4 vertPos)
-            {
-                float3 shadowPos;
-
-                //得到顶点的世界空间坐标
-                float3 worldPos = TransformObjectToWorld(vertPos.xyz).xyz;
-
-                //灯光方向
-                float3 lightDir = normalize(_LightDir.xyz);
-
-                //阴影的世界空间坐标（低于地面的部分不做改变）
-                shadowPos.y = min(worldPos.y, _LightDir.w);
-                shadowPos.xz = worldPos.xz - lightDir.xz * max(0, worldPos.y - _LightDir.w) / lightDir.y;
-
-                return shadowPos;
-            }
-
-            v2f vert(appdata v)
-            {
-                v2f o;
-
-                //得到阴影的世界空间坐标
-                float3 shadowPos = ShadowProjectPos(v.vertex);
-
-                //转换到裁切空间
-                o.vertex = TransformWorldToHClip(shadowPos);
-
-                //得到中心点世界坐标
-                float3 center = float3(unity_ObjectToWorld[0].w, _LightDir.w, unity_ObjectToWorld[2].w);
-                //计算阴影衰减
-                float falloff = 1 - saturate(distance(shadowPos, center) * _ShadowFalloff);
-
-                //阴影颜色
-                o.color = _ShadowColor;
-                o.color.a *= falloff;
-
-                return o;
-            }
-
-            half4 frag(v2f i) : SV_Target
-            {
-                return i.color;
-            }
-            ENDHLSL
-        }
 
         Pass
         {
             Tags
             {
-                "Queue"="Opaque" "RenderType" = "Geometry" "RenderPipeline" = "UniversalPipeline" "ShaderModel"="4.5"
+                "Queue" = "Opaque" "RenderType" = "Geometry" "RenderPipeline" = "UniversalPipeline" "ShaderModel" = "4.5"
             }
             Cull Back
-            ZWrite [_ZWrite]
-            Blend [_SrcBlend] [_DstBlend]
-            Offset [_ZOffset],[_ZOffset]
+            ZWrite[_ZWrite]
+            Blend[_SrcBlend][_DstBlend]
+            Offset[_ZOffset],[_ZOffset]
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -189,12 +100,12 @@
                 o.r = o.g = o.b = stone * _GrayScale;
                 #endif
                 #if _DiSSOLVE
-                    half4 cutoutSource = tex2D(_DissolveMap,  input.tex);
-                    clip(cutoutSource.r - _DissolveClip*1.001 );
-                    float percentage = _DissolveClip / cutoutSource.r;
-                    half3 edgeColor = _DissolveEdgeColor.rgb;
-                    cutoutSource.a = FastSign(percentage -  _ColorFactor);
-                    o.rgb = lerp(o.rgb, edgeColor, saturate(cutoutSource.a));
+                            half4 cutoutSource = tex2D(_DissolveMap,  input.tex);
+                            clip(cutoutSource.r - _DissolveClip * 1.001);
+                            float percentage = _DissolveClip / cutoutSource.r;
+                            half3 edgeColor = _DissolveEdgeColor.rgb;
+                            cutoutSource.a = FastSign(percentage - _ColorFactor);
+                            o.rgb = lerp(o.rgb, edgeColor, saturate(cutoutSource.a));
                 #endif
                 return o;
             }
@@ -260,11 +171,11 @@
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
                 half2 uv = input.uv;
                 #if _DiSSOLVE
-                    half4 cutoutSource = SAMPLE_TEXTURE2D(_DissolveMap, sampler_DissolveMap, uv);
-                    clip(cutoutSource.r - _DissolveClip * 1.001);
-                    float percentage = _DissolveClip / cutoutSource.r;
-                    cutoutSource.a = FastSign(percentage -  _ColorFactor);
-                    return half4(_Color, cutoutSource.a);
+                                    half4 cutoutSource = SAMPLE_TEXTURE2D(_DissolveMap, sampler_DissolveMap, uv);
+                                    clip(cutoutSource.r - _DissolveClip * 1.001);
+                                    float percentage = _DissolveClip / cutoutSource.r;
+                                    cutoutSource.a = FastSign(percentage - _ColorFactor);
+                                    return half4(_Color, cutoutSource.a);
                 #else
                 return half4(_Color, 1);
                 #endif
@@ -293,6 +204,100 @@
             ENDHLSL
         }
 
-        
+        //阴影pass
+        Pass
+        {
+            Name "Shadow"
+
+            Tags
+            {
+                "Queue" = "Transparent"
+                "RenderType" = "Transparent"
+                "RenderPipeline" = "UniversalPipeline"
+                "LightMode" = "UniversalForwardOnly"
+            }
+            //用使用模板测试以保证alpha显示正确
+            Stencil
+            {
+                Ref 0
+                Comp equal
+                Pass incrWrap
+                Fail keep
+                ZFail keep
+            }
+
+            //透明混合模式
+            Blend SrcAlpha OneMinusSrcAlpha
+            ZTest Less
+            //ZWrite Always
+            //关闭深度写入
+            ZWrite on
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #include "UnityCG.cginc"
+
+            struct appdata
+            {
+                float4 vertex : POSITION;
+            };
+
+            struct v2f
+            {
+                float4 vertex : SV_POSITION;
+                float4 color : COLOR;
+            };
+
+            float4 _LightDir;
+            float4 _ShadowColor;
+            float _ShadowFalloff;
+
+            float3 ShadowProjectPos(float4 vertPos)
+            {
+                float3 shadowPos;
+
+                //得到顶点的世界空间坐标
+                float3 worldPos = mul(unity_ObjectToWorld, vertPos).xyz;
+
+                //灯光方向
+                float3 lightDir = normalize(_LightDir.xyz);
+
+                //阴影的世界空间坐标（低于地面的部分不做改变）
+                shadowPos.y = min(worldPos.y, _LightDir.w);
+                shadowPos.xz = worldPos.xz - lightDir.xz * max(0, worldPos.y - _LightDir.w) / lightDir.y;
+
+                return shadowPos;
+            }
+
+            v2f vert(appdata v)
+            {
+                v2f o;
+
+                //得到阴影的世界空间坐标
+                float3 shadowPos = ShadowProjectPos(v.vertex);
+
+                //转换到裁切空间
+                o.vertex = UnityWorldToClipPos(shadowPos);
+
+                //得到中心点世界坐标
+                float3 center = float3(unity_ObjectToWorld[0].w, _LightDir.w, unity_ObjectToWorld[2].w);
+                //计算阴影衰减
+                float falloff = 1 - saturate(distance(shadowPos, center) * _ShadowFalloff);
+
+                //阴影颜色
+                o.color = _ShadowColor;
+                o.color.a *= falloff;
+
+                return o;
+            }
+
+            fixed4 frag(v2f i) : SV_Target
+            {
+                return i.color;
+            }
+            ENDHLSL
+        }
     }
 }

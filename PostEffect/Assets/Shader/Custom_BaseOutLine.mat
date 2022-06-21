@@ -37,15 +37,15 @@ Material:
     - _DstBlend: 0
     - _GrayScale: 1
     - _Outline: 0.013
-    - _ShadowFalloff: 0.8
+    - _ShadowFalloff: 0.2
     - _SrcBlend: 1
     - _ZOffset: 0
     - _ZWrite: 1
     - _turn_stone: 0
     m_Colors:
-    - _Color: {r: 0.9245283, g: 0.31835172, b: 0.31835172, a: 0}
+    - _Color: {r: 0.6226415, g: 0.50809896, b: 0.50809896, a: 0}
     - _Diffuse: {r: 0.6981132, g: 0.121840514, b: 0.121840514, a: 1}
     - _DissolveEdgeColor: {r: 1, g: 1, b: 1, a: 1}
-    - _LightDir: {r: 0, g: 1, b: 1, a: -0.7}
-    - _ShadowColor: {r: 0, g: 0.05174897, b: 0.9528302, a: 1}
+    - _LightDir: {r: 0, g: 1, b: 1, a: 0.02}
+    - _ShadowColor: {r: 0, g: 0.018169222, b: 0.33962262, a: 1}
   m_BuildTextureStacks: []
