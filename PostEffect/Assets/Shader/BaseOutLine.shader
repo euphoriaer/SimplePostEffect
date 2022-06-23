@@ -18,9 +18,9 @@
         [Toggle(_TURN_STONE)]_turn_stone("石化", int) = 0
         _GrayScale("石化强度", Float) = 1
 
-        _LightDir("_LightDir", Vector) = (1, 1, 1, 1)
-        _ShadowColor("_ShadowColor", Color) = (1, 1, 1, 1)
-        _ShadowFalloff("_ShadowFalloff", Float) = 1
+        _LightDir2("_LightDir", Vector) = (0, 1, 1, 0.1)
+        _ShadowColor2("_ShadowColor", Color) = (0, 0, 0, 1)
+        _ShadowFalloff2("_ShadowFalloff", Float) = 0
     }
 
     SubShader
@@ -250,9 +250,9 @@
                 float4 color : COLOR;
             };
 
-            float4 _LightDir;
-            float4 _ShadowColor;
-            float _ShadowFalloff;
+            float4 _LightDir2;
+            float4 _ShadowColor2;
+            float _ShadowFalloff2;
 
             float3 ShadowProjectPos(float4 vertPos)
             {
@@ -262,11 +262,11 @@
                 float3 worldPos = mul(unity_ObjectToWorld, vertPos).xyz;
 
                 //灯光方向
-                float3 lightDir = normalize(_LightDir.xyz);
+                float3 lightDir = normalize(_LightDir2.xyz);
 
                 //阴影的世界空间坐标（低于地面的部分不做改变）
-                shadowPos.y = min(worldPos.y, _LightDir.w);
-                shadowPos.xz = worldPos.xz - lightDir.xz * max(0, worldPos.y - _LightDir.w) / lightDir.y;
+                shadowPos.y = min(worldPos.y, _LightDir2.w);
+                shadowPos.xz = worldPos.xz - lightDir.xz * max(0, worldPos.y - _LightDir2.w) / lightDir.y;
 
                 return shadowPos;
             }
@@ -282,12 +282,12 @@
                 o.vertex = UnityWorldToClipPos(shadowPos);
 
                 //得到中心点世界坐标
-                float3 center = float3(unity_ObjectToWorld[0].w, _LightDir.w, unity_ObjectToWorld[2].w);
+                float3 center = float3(unity_ObjectToWorld[0].w, _LightDir2.w, unity_ObjectToWorld[2].w);
                 //计算阴影衰减
-                float falloff = 1 - saturate(distance(shadowPos, center) * _ShadowFalloff);
+                float falloff = 1 - saturate(distance(shadowPos, center) * _ShadowFalloff2);
 
                 //阴影颜色
-                o.color = _ShadowColor;
+                o.color = _ShadowColor2;
                 o.color.a *= falloff;
 
                 return o;
