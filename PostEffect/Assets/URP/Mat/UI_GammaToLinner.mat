@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: UI_Default
+  m_Name: UI_GammaToLinner
   m_Shader: {fileID: 4800000, guid: cb6c89d3ffd71714bbc38cdf4344cca2, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []

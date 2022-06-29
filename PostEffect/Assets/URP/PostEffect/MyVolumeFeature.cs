@@ -5,39 +5,50 @@ using UnityEngine.Rendering.Universal;
 public class MyVolumeFeature : ScriptableRendererFeature
 {
     public Material Material; //UniversalRenderPipelineAsset_Renderer 面板，设置材质
-    public Color BlendColor;
     private MyVolumeFeaturePass myPass;
 
     public override void Create()
     {
         myPass = new MyVolumeFeaturePass();
+        myPass.renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
     }
+
 
     public override void AddRenderPasses(ScriptableRenderer renderer, ref RenderingData renderingData)
     {
         renderer.EnqueuePass(myPass);
-        myPass.SetValue(renderer.cameraColorTarget, Material, BlendColor); //传递给Pass 处理
+        myPass.SetValue(renderer.cameraColorTarget, Material); //传递摄像机图像，和材质，给Pass 处理
     }
 }
 
 public class MyVolumeFeaturePass : ScriptableRenderPass
 {
-    private Material Material;
-    private RenderTargetIdentifier source;
-    private Color color;//接受面板颜色
+
+    // This method is called before executing the render pass.
+    // It can be used to configure render targets and their clear state. Also to create temporary render target textures.
+    // When empty this render pass will render to the active camera render target.
+    // You should never call CommandBuffer.SetRenderTarget. Instead call <c>ConfigureTarget</c> and <c>ConfigureClear</c>.
+    // The render pipeline will ensure target setup and clearing happens in a performant manner.
+    public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
+    {
+        
+        
+    }
+
+    private Material Material;//接受从Feature 面板设置的材质
+    private RenderTargetIdentifier source;//接受相机图像
+
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
     {
-        MyVolume Volume = VolumeManager.instance.stack.GetComponent<MyVolume>();
-
-        if (!Volume.IsActive())//没激活Volume 则不后处理
+        if (renderingData.cameraData.camera.name != "UIMain Camera (4)")
         {
             return;
         }
         //执行后处理
-        //设置要混合的材质参数，从Volume 获取
-        Material = Volume.Material.value;
-        Material.SetColor("_Color", Volume.BlendColor.value);
-
+        if (Material == null)
+        {
+            return;
+        }
         CommandBuffer cmd = CommandBufferPool.Get();
         //source  //源图像
         var dec = renderingData.cameraData.cameraTargetDescriptor; //目标图像
@@ -52,10 +63,9 @@ public class MyVolumeFeaturePass : ScriptableRenderPass
         CommandBufferPool.Release(cmd);
     }
 
-    public void SetValue(RenderTargetIdentifier source, Material material, Color blendColor)
+    public void SetValue(RenderTargetIdentifier source, Material material)
     {
         Material = material; //接受面板材质
         this.source = source;
-        color = blendColor;
     }
 }

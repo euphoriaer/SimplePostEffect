@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public class MyFeature : ScriptableRendererFeature
+public class CustomRenderPassFeature : ScriptableRendererFeature
 {
     class CustomRenderPass : ScriptableRenderPass
     {
@@ -13,6 +13,7 @@ public class MyFeature : ScriptableRendererFeature
         // The render pipeline will ensure target setup and clearing happens in a performant manner.
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
+
         }
 
         // Here you can implement the rendering logic.
