@@ -1,5 +1,39 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-6968523030313559615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e2a99350e71e7e478f27f81cde566e5, type: 3}
+  m_Name: AdditionPostProcessRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  shader: {fileID: 4800000, guid: f36f44f41baa27f4d8f6d91616ec3db6, type: 3}
+  _Material: {fileID: 0}
+--- !u!114 &-5775554848071412867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 300f427c4eb88824693fecb8be545cc0, type: 3}
+  m_Name: FeatureTest
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  Material: {fileID: 2100000, guid: 83cf7a5d1c756fb47bc1ab5900e51a4f, type: 2}
+  BlendColor:
+    r: 0.735849
+    g: 0.503293
+    b: 0.503293
+    a: 0.7176471
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15,8 +49,8 @@ MonoBehaviour:
   debugShaders:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
-  - {fileID: 621650492545594742}
-  m_RendererFeatureMap: 7675a04ed48ba008
+  - {fileID: 5085705267524174974}
+  m_RendererFeatureMap: 7e841cdffe0d9446
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -67,3 +101,47 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Active: 1
   Material: {fileID: 2100000, guid: 2fb87d1703b0587459ec04f7cea5ff1d, type: 2}
+--- !u!114 &638517401495910619
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fd87c2c51da4ed43817f642141bceff, type: 3}
+  m_Name: MyVolumeFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  Material: {fileID: 2100000, guid: 0536bbe56ed446f4f951efb4fdc68314, type: 2}
+--- !u!114 &2267139659414368934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d53401a475c4c3b4fb399cf25c90d8ed, type: 3}
+  m_Name: AdditionPostProcessRendererFeature
+  m_EditorClassIdentifier: 
+  m_Active: 0
+  shader: {fileID: 4800000, guid: f36f44f41baa27f4d8f6d91616ec3db6, type: 3}
+  _Material: {fileID: 0}
+--- !u!114 &5085705267524174974
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3fe6050202a67b449418296d40f0ca5, type: 3}
+  m_Name: CameraFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  Material: {fileID: 0}
+  CameraName: UICamera
