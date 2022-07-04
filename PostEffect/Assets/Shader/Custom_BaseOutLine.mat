@@ -38,7 +38,7 @@ Material:
     - _GrayScale: 1
     - _Outline: 0.013
     - _ShadowFalloff: 0.2
-    - _ShadowFalloff2: 0
+    - _ShadowFalloff2: 0.04
     - _SrcBlend: 1
     - _ZOffset: 0
     - _ZWrite: 1
@@ -48,7 +48,7 @@ Material:
     - _Diffuse: {r: 0.6981132, g: 0.121840514, b: 0.121840514, a: 1}
     - _DissolveEdgeColor: {r: 1, g: 1, b: 1, a: 1}
     - _LightDir: {r: 0, g: 1, b: 1, a: 0.02}
-    - _LightDir2: {r: 0, g: 1, b: 1, a: 0.1}
+    - _LightDir2: {r: 0, g: 1, b: 1, a: -0.08}
     - _ShadowColor: {r: 0.4542097, g: 0.46009442, b: 0.5566038, a: 1}
     - _ShadowColor2: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

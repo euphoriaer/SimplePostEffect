@@ -49,7 +49,7 @@ MonoBehaviour:
   m_Active: 1
   Material: {fileID: 2100000, guid: ad4e1adae6be1b94e9c9cf8139578ee1, type: 2}
   CameraName: UICamera
-  RenderPassEvent: 300
+  RenderPassEvent: 450
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
