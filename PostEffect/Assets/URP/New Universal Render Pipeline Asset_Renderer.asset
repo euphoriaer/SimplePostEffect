@@ -34,6 +34,22 @@ MonoBehaviour:
     g: 0.503293
     b: 0.503293
     a: 0.7176471
+--- !u!114 &-2613202160876603760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3fe6050202a67b449418296d40f0ca5, type: 3}
+  m_Name: CameraFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
+  Material: {fileID: 2100000, guid: ad4e1adae6be1b94e9c9cf8139578ee1, type: 2}
+  CameraName: UICamera
+  RenderPassEvent: 300
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50,7 +66,8 @@ MonoBehaviour:
     debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
   m_RendererFeatures:
   - {fileID: 5085705267524174974}
-  m_RendererFeatureMap: 7e841cdffe0d9446
+  - {fileID: -2613202160876603760}
+  m_RendererFeatureMap: 7e841cdffe0d944690b6aae27a0abcdb
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -143,5 +160,6 @@ MonoBehaviour:
   m_Name: CameraFeature
   m_EditorClassIdentifier: 
   m_Active: 1
-  Material: {fileID: 0}
+  Material: {fileID: 2100000, guid: 0536bbe56ed446f4f951efb4fdc68314, type: 2}
   CameraName: UICamera
+  RenderPassEvent: 500
